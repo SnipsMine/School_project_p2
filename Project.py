@@ -26,7 +26,6 @@ import sys
 from vapory import Sphere, Camera, LightSource, Scene
 from pypovray import pypovray, models, pdb
 
-
 # Functions
 def get_animation_data():
     """
@@ -55,19 +54,19 @@ def get_animation_data():
                }
 
     water = {"name": "water",
-             "molecule": [True, False, "pdb/water.pdb"],
-             "keyframe_frames": [0],
-             "keyframe_endpos": [[0, 0, 0],
-                                 ]
+               "molecule": [True, False, "pdb/water.pdb"],
+               "keyframe_frames": [0],
+               "keyframe_endpos": [[0, 0, 0],
+                                   ]
              }
     
-    nad = {"name": "NAD",
-           "molecule": [True, False, "pdb/NAD.pdb"],
-           "keyframe_frames": [0, 10, 20],
-           "keyframe_endpos": [[-30, 50, 0],
-                               [-30, 50, 0],
-                               [15, 15, 0],
-                               ]
+    NAD = {"name": "NAD",
+               "molecule": [True, False, "pdb/NAD.pdb"],
+               "keyframe_frames": [0, 10, 20],
+               "keyframe_endpos": [[-30, 50, 0],
+                                   [-30, 50, 0],
+                                   [15, 15, 0],
+                                   ]
            }
 
     enzyme1 = {"name": "enzyme1",
@@ -85,46 +84,46 @@ def get_animation_data():
                }
 
     waterstof = {"name": "waterstof",
-                 "molecule": [True, True, "ethanol", [3]],
-                 "keyframe_frames": [20, 25],
-                 "keyframe_endpos": [[0, 0, 0],
-                                     [0, -4, 0],
-                                     ]
-                 }
+               "molecule": [True, True, "ethanol", [3]],
+               "keyframe_frames": [20, 25],
+               "keyframe_endpos": [[0, 0, 0],
+                                   [0, -4, 0],
+                                   ]
+               }
 
-    hnad = {"name": "hNAD",
-            "molecule": [True, True, "ethanol", [8]],
-            "keyframe_frames": [20, 25],
-            "keyframe_endpos": [[0, 0, 0],
-                                [-4, 0, 0],
-                                ]
+    hNAD = {"name": "hNAD",
+               "molecule": [True, True, "ethanol", [8]],
+               "keyframe_frames": [20, 25],
+               "keyframe_endpos": [[0, 0, 0],
+                                   [-4, 0, 0],
+                                   ]
             }
     h_movement = {"name": "h_movement",
-                  "molecule": [True, True, "ethanol", [4]],
-                  "keyframe_frames": [20, 25],
-                  "keyframe_endpos": [[0, 0, 0],
-                                      [0.1, -0.3, -0.8],
-                                      ]
-                  }
+               "molecule": [True, True, "ethanol", [4]],
+               "keyframe_frames": [20, 25],
+               "keyframe_endpos": [[0, 0, 0],
+                                   [0.1, -0.3, -0.8],
+                                   ]
+               }
 
     ANIMATION_OBJECTS = {"ethanol": ethanol,
                          "water": water,
-                         "NAD": nad,
+                         "NAD": NAD,
                          "enzyme1": enzyme1,
                          "enzyme2": enzyme2,
                          "waterstof": waterstof,
-                         "hNAD": hnad,
+                         "hNAD": hNAD,
                          "h_movement": h_movement,
                          }
     return
 
 
-def molecules(frame=None, molecules={}):
+def molecules(frame = None, molecules = {}):
 
     sorted_animation_objects = sort_molecules()
     
     for obj in sorted_animation_objects:
-        molecule_data = sorted_animation_objects[obj]["molecule"]
+        molecule_data = ANIMATION_OBJECTS[obj]["molecule"]
         
         if molecule_data[0] and not molecule_data[1] and frame == None:
             # Making normal molecules from pdb file
@@ -136,7 +135,7 @@ def molecules(frame=None, molecules={}):
 
         elif molecule_data[0] and molecule_data[1]:
             # Split a larger molecule to create a atom
-            if not frame == None and frame >= sorted_animation_objects[obj]["keyframe_frames"][0]:
+            if not frame == None and frame >= ANIMATION_OBJECTS[obj]["keyframe_frames"][0]:
                 split_molecule = MOLECULES[molecule_data[2]].divide(molecule_data[3],
                                                               obj,
                                                               offset=[0, 0, 0]
@@ -160,7 +159,7 @@ def molecules(frame=None, molecules={}):
 
 def sort_molecules():
     """Sorts the animaion objects so that there are no split errors happen"""
-    sorted_animation_objects = {}
+    sorted_animation_objects = []
 
     special_object_list = []
 
@@ -174,23 +173,35 @@ def sort_molecules():
             special_object_list.append([molecule_name, mother_molecule, split_atom])
         else:
             # Objects that do not need to be split
-            sorted_animation_objects[obj] = ANIMATION_OBJECTS[obj]
+            sorted_animation_objects.append(obj)
 
     # Get a list of mother molecules from the special object list
     mother_list = list(set([special_object_list[index][1] for index in range(len(special_object_list))]))
 
     for mother in mother_list:
-        high_2_low = get_highest(mother, special_object_list)
+        high_2_low = get_highest(mother, special_object_list, [])
         print("SORTED:",high_2_low)
         for obj in high_2_low:
-            sorted_animation_objects[obj] = [ANIMATION_OBJECTS[obj], high_2_low.index[obj]]
+            if not obj in sorted_animation_objects:
+                sorted_animation_objects.append(obj)
 
     # Print objects in sorter for debugging
     for obj in sorted_animation_objects:
-        print("DEBUG:", obj)
+        #print("DEBUG:", obj)
         pass
 
     return sorted_animation_objects
+
+
+def get_mothers(object_list):
+    """Outputs a list of all mother molecuels that are needed for the molecule spliting"""
+    mother_list = []
+
+    for index in range(len(object_list)):
+        if not object_list[index][1] in mother_list:
+            mother_list.append(object_list[index][1])
+    
+    return mother_list
 
 
 def get_highest(mother, object_list, high_2_low = []):
@@ -204,10 +215,12 @@ def get_highest(mother, object_list, high_2_low = []):
     
     high_2_low.append(highest_molecule)
     object_list.pop(object_list.index([highest_molecule, mother, [highest]]))
-
+    
+    print(highest_molecule)
+    print(high_2_low)
     if is_mother_in_list(mother, object_list):
         get_highest(mother, object_list, high_2_low)
-        
+    print(high_2_low)
     return  high_2_low
 
 
@@ -279,14 +292,16 @@ def move_objects(obj, step, mother = False):
         
         elif molecule_data[0] and molecule_data[1]:
             # If the other statment are false do this
-            print("elif2:", obj)
+            if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
+                print("elif2:", obj)
             distance = MOLECULES[obj]["start"].copy()
             for index in range(frame+1):
                 distance += keyframe_endpos_data[index]
             MOLECULES[obj]["molecule"].move_to(distance)
             
         elif molecule_data[0]:
-            print("elif3:", obj)
+            if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
+                print("elif3:", obj)
             MOLECULES[obj].move_to(keyframe_endpos_data[frame])
 
 
@@ -296,7 +311,7 @@ def frame(step):
     cam = Camera("location", [0, 0, 100], "look_at", [0, 0, 0])
     light = LightSource([0, 0, 100], 1)
     render_list = [light]
-
+    print("frame:{}----------------------------------------------------------------".format(step))  
     # Is there another None molecule that needs to be created.
     for obj in MOLECULES:
         molecule_data = ANIMATION_OBJECTS[obj]["molecule"]
@@ -321,8 +336,7 @@ def frame(step):
             elif molecule_data[0]:
                 render_list = render_list + MOLECULES[obj].povray_molecule
             else:
-                render_list = render_list + MOLECULES[obj]                
-                        
+                render_list = render_list + MOLECULES[obj]                                  
     return Scene(cam, objects=render_list)
 
 
@@ -331,7 +345,7 @@ def main():
     global MOLECULES
     get_animation_data()
     MOLECULES = molecules()
-    pypovray.render_scene_to_png(frame, range(19, 26))
+    pypovray.render_scene_to_png(frame, range(19, 30))
 
     print(MOLECULES["ethanol"])
     
