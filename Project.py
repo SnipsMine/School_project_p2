@@ -54,19 +54,19 @@ def get_animation_data():
                }
 
     water = {"name": "water",
-               "molecule": [True, False, "pdb/water.pdb"],
-               "keyframe_frames": [0],
-               "keyframe_endpos": [[0, 0, 0],
-                                   ]
+             "molecule": [True, False, "pdb/water.pdb"],
+             "keyframe_frames": [0],
+             "keyframe_endpos": [[0, 0, 0],
+                                 ]
              }
     
-    NAD = {"name": "NAD",
-               "molecule": [True, False, "pdb/NAD.pdb"],
-               "keyframe_frames": [0, 10, 20],
-               "keyframe_endpos": [[-30, 50, 0],
-                                   [-30, 50, 0],
-                                   [15, 15, 0],
-                                   ]
+    nad = {"name": "NAD",
+           "molecule": [True, False, "pdb/NAD.pdb"],
+           "keyframe_frames": [0, 10, 20],
+           "keyframe_endpos": [[-30, 50, 0],
+                               [-30, 50, 0],
+                               [15, 15, 0],
+                               ]
            }
 
     enzyme1 = {"name": "enzyme1",
@@ -84,41 +84,41 @@ def get_animation_data():
                }
 
     waterstof = {"name": "waterstof",
-               "molecule": [True, True, "ethanol", [3]],
-               "keyframe_frames": [20, 25],
-               "keyframe_endpos": [[0, 0, 0],
-                                   [0, -4, 0],
-                                   ]
-               }
+                 "molecule": [True, True, "ethanol", [3]],
+                 "keyframe_frames": [20, 25],
+                 "keyframe_endpos": [[0, 0, 0],
+                                     [0, -4, 0],
+                                     ]
+                 }
 
-    hNAD = {"name": "hNAD",
-               "molecule": [True, True, "ethanol", [8]],
-               "keyframe_frames": [20, 25],
-               "keyframe_endpos": [[0, 0, 0],
-                                   [-4, 0, 0],
-                                   ]
+    hnad = {"name": "hNAD",
+            "molecule": [True, True, "ethanol", [8]],
+            "keyframe_frames": [20, 25],
+            "keyframe_endpos": [[0, 0, 0],
+                                [-4, 0, 0],
+                                ]
             }
     h_movement = {"name": "h_movement",
-               "molecule": [True, True, "ethanol", [4]],
-               "keyframe_frames": [20, 25],
-               "keyframe_endpos": [[0, 0, 0],
-                                   [0.1, -0.3, -0.8],
-                                   ]
-               }
+                  "molecule": [True, True, "ethanol", [4]],
+                  "keyframe_frames": [20, 25],
+                  "keyframe_endpos": [[0, 0, 0],
+                                      [0.1, -0.3, -0.8],
+                                      ]
+                  }
 
     ANIMATION_OBJECTS = {"ethanol": ethanol,
                          "water": water,
-                         "NAD": NAD,
+                         "NAD": nad,
                          "enzyme1": enzyme1,
                          "enzyme2": enzyme2,
                          "waterstof": waterstof,
-                         "hNAD": hNAD,
+                         "hNAD": hnad,
                          "h_movement": h_movement,
                          }
     return
 
 
-def molecules(frame = None, molecules = {}):
+def molecules(frame=None, molecules={}):
 
     sorted_animation_objects = sort_molecules()
     
@@ -193,17 +193,6 @@ def sort_molecules():
     return sorted_animation_objects
 
 
-def get_mothers(object_list):
-    """Outputs a list of all mother molecuels that are needed for the molecule spliting"""
-    mother_list = []
-
-    for index in range(len(object_list)):
-        if not object_list[index][1] in mother_list:
-            mother_list.append(object_list[index][1])
-    
-    return mother_list
-
-
 def get_highest(mother, object_list, high_2_low = []):
     """outputs a list from high to low"""
     highest = -1
@@ -215,12 +204,10 @@ def get_highest(mother, object_list, high_2_low = []):
     
     high_2_low.append(highest_molecule)
     object_list.pop(object_list.index([highest_molecule, mother, [highest]]))
-    
-    print(highest_molecule)
-    print(high_2_low)
+
     if is_mother_in_list(mother, object_list):
         get_highest(mother, object_list, high_2_low)
-    print(high_2_low)
+        
     return  high_2_low
 
 
@@ -289,7 +276,7 @@ def move_objects(obj, step, mother = False):
             if not molecule_data[1]:
                 MOLECULES[obj].move_to(keyframe_endpos_data[frame])
             break
-        
+
         elif molecule_data[0] and molecule_data[1]:
             # If the other statment are false do this
             if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
@@ -298,7 +285,7 @@ def move_objects(obj, step, mother = False):
             for index in range(frame+1):
                 distance += keyframe_endpos_data[index]
             MOLECULES[obj]["molecule"].move_to(distance)
-            
+
         elif molecule_data[0]:
             if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
                 print("elif3:", obj)
@@ -311,7 +298,9 @@ def frame(step):
     cam = Camera("location", [0, 0, 100], "look_at", [0, 0, 0])
     light = LightSource([0, 0, 100], 1)
     render_list = [light]
+    
     print("frame:{}----------------------------------------------------------------".format(step))  
+
     # Is there another None molecule that needs to be created.
     for obj in MOLECULES:
         molecule_data = ANIMATION_OBJECTS[obj]["molecule"]
@@ -321,7 +310,6 @@ def frame(step):
             print(ANIMATION_OBJECTS[molecule_data[2]]["name"])
             move_objects(ANIMATION_OBJECTS[molecule_data[2]]["name"], keyframe_frames_data[0])
             MOLECULES = molecules(step, MOLECULES)
-
 
     for obj in ANIMATION_OBJECTS:
         molecule_data = ANIMATION_OBJECTS[obj]["molecule"]
