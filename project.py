@@ -10,11 +10,10 @@ Current functions:
 - Split atoms form larger molecules
 - Move the atoms to offset
 - Create basic vapory objects
-- Joining two molecules together into one molecule
+- Joining multiple molecules together into one molecule
 - Rotation of molecules (only with single core renders)
 
 Upcomming functions:
-- Joining 3+ molecules together into one molecuele
 - Rotation of molecules with multi core render support
 - Stop showing objects
 - Start showing objects (currently all objects are always shown)
@@ -86,40 +85,21 @@ def get_animation_data():
 
     global ANIMATION_OBJECTS
 
-    ethanol = {"name": "ethanol",
-               "molecule": [True, False, "pdb/ethanol2.pdb"],
-               "keyframe_endpos_frames": [0, 10, 25, 30],
-               "keyframe_endpos": [[60, 0, 0],
-                                   [30, 0, 0],
-                                   [30, 0, 0, "join", "h_movement"],
-                                   [0, 0, 0]],
-               "keyframe_rotation_frames":[25, 30],
-               "keyframe_rotation":[[[0, 0, 0], [0, 0, 0]],
-                                    [[0, 1, 0], [0, math.pi*2, 0]]],
-               "keyframe_shown_frames": None,
-               "keyframe_shown": None,
-               }
+    # Camera
+    camera = {"name": "camera",
+              "molecule": [False, Camera("lokation", [0, 0, 100], "look_at", [0, 0, 0])],
+              "keyframe_endpos_frames": [0, 30, 90, 140, 190, 250, 280],
+              "keyframe_endpos": [[[0, 0, 100], [0, 0, 0]],
+                                  [[30, 0, 50], [30, 0, -10]],
+                                  [[30, 0, 50], [30, 0, -10]],
+                                  [[0, 0, 75], [0, 0, 0]],
+                                  [[-30, 0, 50], [-30, 0, -10]],
+                                  [[-30, 0, 50], [-30, 0, -10]],
+                                  [[0, 0, 100], [0, 0, 0]],
+                                  ],
+              }
 
-    water = {"name": "water",
-             "molecule": [True, False, "pdb/water.pdb"],
-             "keyframe_endpos_frames": [0],
-             "keyframe_endpos": [[0, 0, 0],
-                                 ],
-             }
-
-    nad = {"name": "NAD",
-           "molecule": [True, False, "pdb/NAD.pdb"],
-           "keyframe_endpos_frames": [0, 10, 20],
-           "keyframe_endpos": [[-30, 50, 0],
-                               [-30, 50, 0],
-                               [20, 7.5, 0],
-                               ],
-           "keyframe_rotation_frames": [10, 20],
-           "keyframe_rotation": [[[0, 0, 0], [0, 0, 0]],
-                                 [[1, 1, 1], [1.9, 3.4, 1.8]]
-                                 ],
-           }
-
+    # Static vapory objects
     enzyme1 = {"name": "enzyme1",
                "molecule": [False, Sphere([30, 0, -10], 4, models.default_sphere_model)],
                "keyframe_endpos_frames": [0],
@@ -133,47 +113,193 @@ def get_animation_data():
                "keyframe_endpos": [[-30, 0, -10],
                                    ],
                }
+    
+    # Molecules step 1 (alcohol dehydrogenase)
+    ethanol1 = {"name": "ethanol1",
+               "molecule": [True, False, "pdb/ethanol2.pdb"],
+               "keyframe_endpos_frames": [30, 75, 90, 140, 190, 205, 250],
+               "keyframe_endpos": [[70, 0, 0],
+                                   [30, 0, 0],
+                                   [30, 0, 0, "join", False, "h_movement1"],
+                                   [0, 0, 0],
+                                   [-30, 0, 0],
+                                   [-30, 0, 0, "join", False, "water3"],
+                                   [-70, 0, 0]
+                                   ],
+               "keyframe_rotation_frames":[30, 75, 90, 140, 190, 205, 260],
+               "keyframe_rotation":[[[0, 0, 0], [0, 0, 0]],
+                                    [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                    [[0, 0, 0], [0, 0, 0]],
+                                    [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                    [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                    [[0, 0, 0], [0, 0, 0]],
+                                    [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                    ],
+               }
 
-    waterstof = {"name": "waterstof",
-                 "molecule": [True, True, "ethanol", [3]],
-                 "keyframe_endpos_frames": [20, 25],
+    water1 = {"name": "water1",
+             "molecule": [True, False, "pdb/water.pdb"],
+             "keyframe_endpos_frames": [30, 75, 90, 150],
+             "keyframe_endpos": [[-30, -70, 0],
+                                 [30, -7.5, 0],
+                                 [30, -7.5, 0, "join", False, "waterstof1"],
+                                 [70, -70, 0],
+                                 ],
+             "keyframe_rotation_frames":[30, 75, 90, 150],
+             "keyframe_rotation":[[[0, 0, 0], [0, 0, 0]],
+                                  [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                  [[0, 0, 0], [0, 0, 0]],
+                                  [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]]
+                                  ],
+             }
+
+    nad1 = {"name": "NAD1",
+           "molecule": [True, False, "pdb/NAD.pdb"],
+           "keyframe_endpos_frames": [30, 75, 90, 150],
+           "keyframe_endpos": [[-30, 70, 0],
+                               [20, 7.5, 0],
+                               [20, 7.5, 0, "join", False, "h_movement_nad1", "hNAD1"],
+                               [70, 70, 0],
+                               ],
+           "keyframe_rotation_frames": [30, 75, 90, 150],
+           "keyframe_rotation": [[[0, 0, 0], [0, 0, 0]],
+                                 [[1, 1, 1], [math.pi, 1.5, 0]],
+                                 [[0, 0, 0], [0, 0, 0]],
+                                 [[1, 1, 1], [math.pi, math.pi*2, math.pi]],
+                                 ],
+           }
+
+    waterstof1 = {"name": "waterstof1",
+                 "molecule": [True, True, "ethanol1", [3]],
+                 "keyframe_endpos_frames": [75, 90],
                  "keyframe_endpos": [[0, 0, 0],
-                                     [0, -4, 0],
+                                     [-0.3, -5.5, -0.2],
                                      ],
+                  "keyframe_shown_frames": [0, 90],
+                  "keyframe_shown": [True, False]
                  }
 
-    hnad = {"name": "hNAD",
-            "molecule": [True, True, "ethanol", [8]],
-            "keyframe_endpos_frames": [20, 25],
+    hnad1 = {"name": "hNAD1",
+            "molecule": [True, True, "ethanol1", [8]],
+            "keyframe_endpos_frames": [75, 90],
             "keyframe_endpos": [[0, 0, 0],
-                                [-4, 3, 1],
+                                [-6, 2.7, -1.5],
                                 ],
+            "keyframe_shown_frames": [0, 90],
+            "keyframe_shown": [True, False]
             }
 
-    h_movement = {"name": "h_movement",
-                  "molecule": [True, True, "ethanol", [4]],
-                  "keyframe_endpos_frames": [20, 25],
+    h_movement1 = {"name": "h_movement1",
+                  "molecule": [True, True, "ethanol1", [4]],
+                  "keyframe_endpos_frames": [75, 90],
                   "keyframe_endpos": [[0, 0, 0],
                                       [0.1, -0.3, 0.8],
                                       ],
+                  "keyframe_shown_frames": [0, 90],
+                  "keyframe_shown": [True, False]
                   }
-    h_movement_nad = {"name": "h_movement_nad",
-                      "molecule": [True, True, "NAD", [65]],
-                      "keyframe_endpos_frames": [20, 25],
+
+    h_movement_nad1 = {"name": "h_movement_nad1",
+                      "molecule": [True, True, "NAD1", [64]],
+                      "keyframe_endpos_frames": [75, 90],
                       "keyframe_endpos": [[0, 0, 0],
-                                        [-0.5, 0.1, 0.5],
+                                        [-0.3, 0.2, -0.9],
+                                        ],
+                      "keyframe_shown_frames": [0, 90],
+                      "keyframe_shown": [True, False]
+                      }
+
+    # moleculen stap 2 (ethanal dehydrogenase)
+    nad2 = {"name": "NAD2",
+           "molecule": [True, False, "pdb/NAD.pdb"],
+           "keyframe_endpos_frames": [145, 190, 205, 260],
+           "keyframe_endpos": [[-90, 70, 0],
+                               [-40, 7.5, 0],
+                               [-40, 7.5, 0, "join", False, "h_movement_nad2", "hNAD2"],
+                               [10, 70, 0],
+                               ],
+           "keyframe_rotation_frames": [145, 190, 205, 260],
+           "keyframe_rotation": [[[0, 0, 0], [0, 0, 0]],
+                                 [[1, 1, 1], [math.pi, 1.5, 0]],
+                                 [[0, 0, 0], [0, 0, 0]],
+                                 [[1, 1, 1], [math.pi, math.pi*2, math.pi]],
+                                 ],
+           }
+
+    water2 = {"name": "water2",
+             "molecule": [True, False, "pdb/water.pdb"],
+             "keyframe_endpos_frames": [145, 190, 205, 260],
+             "keyframe_endpos": [[-90, -70, 0],
+                                 [-30, -7.5, 0],
+                                 [-30, -7.5, 0, "join", False, "waterstof2"],
+                                 [30, -70, 0],
+                                 ],
+             "keyframe_rotation_frames":[145, 190, 205, 260],
+             "keyframe_rotation":[[[0, 0, 0], [0, 0, 0]],
+                                  [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                  [[0, 0, 0], [0, 0, 0]],
+                                  [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]]
+                                  ],
+             }
+    water3 = {"name": "water3",
+             "molecule": [True, False, "pdb/water.pdb"],
+             "keyframe_endpos_frames": [145, 190, 205, 260],
+             "keyframe_endpos": [[-90, -70, 0],
+                                 [-35, -2, 0],
+                                 [-31, -2.2, 0.2],
+                                 [30, -70, 0],
+                                 ],
+             "keyframe_rotation_frames":[145, 190, 205, 260],
+             "keyframe_rotation":[[[0, 0, 0], [0, 0, 0]],
+                                  [[1, 1, 1], [math.pi*2, math.pi*2, math.pi]],
+                                  [[1, 0, 0], [1, 0, 0]],
+                                  [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]]
+                                  ],
+             }
+
+    waterstof2 = {"name": "waterstof2",
+                 "molecule": [True, True, "ethanol1", [6]],
+                 "keyframe_endpos_frames": [190, 205],
+                 "keyframe_endpos": [[0, 0, 0],
+                                     [-0.3, -5.5, -0.2],
+                                     ],
+                  }
+
+    hnad2 = {"name": "hNAD1",
+            "molecule": [True, True, "water3", [2]],
+            "keyframe_endpos_frames": [190, 205],
+            "keyframe_endpos": [[0, 0, 0],
+                                [-1.8, 5.8, 0],
+                                ],
+            }
+
+    h_movement_nad2 = {"name": "h_movement_nad2",
+                      "molecule": [True, True, "NAD2", [64]],
+                      "keyframe_endpos_frames": [190, 205],
+                      "keyframe_endpos": [[0, 0, 0],
+                                        [-0.3, 0.2, -0.9],
                                         ],
                       }
 
-    ANIMATION_OBJECTS = {"ethanol": ethanol,
-                         "water": water,
-                         "NAD": nad,
+    ANIMATION_OBJECTS = {"camera": camera,
+                         # Static vapory objects
                          "enzyme1": enzyme1,
                          "enzyme2": enzyme2,
-                         "waterstof": waterstof,
-                         "hNAD": hnad,
-                         "h_movement": h_movement,
-                         "h_movement_nad": h_movement_nad,
+                         # moleculen stap 1
+                         "ethanol1": ethanol1,
+                         "water1": water1,
+                         "NAD1": nad1,
+                         "waterstof1": waterstof1,
+                         "hNAD1": hnad1,
+                         "h_movement1": h_movement1,
+                         "h_movement_nad1": h_movement_nad1,
+                         #moleculen stap 2
+                         "NAD2": nad2,
+                         "water2": water2,
+                         "water3": water3,
+                         "waterstof2": waterstof2,
+                         "hNAD2": hnad2,
+                         "h_movement_nad2": h_movement_nad2,
                          }
 
 
@@ -287,22 +413,21 @@ def calculate_distance(frames, ends, step, molecule_start, offset=False):
     return distance_list
 
 
-def calculate_radians(frames, ends, molecule_start):
+def calculate_radians(frames, ends):
     """Calculates how many radians must be moved per step"""
     time = frames[1] - frames[0]
-    
     radians_list = []
-    for index, start in enumerate(molecule_start):
-        end = ends[index] - start
-        radians = start + end / time
+    for end in ends:
+        radians = end / time
         radians_list.append(radians)
-
     return radians_list
 
 
 def molecule_maker(mol1, mol2, name):
     """Combines two molecules into one"""
-    combo = mol1.atoms + mol2.atoms
+    combo = mol1.atoms
+    while len(mol2.atoms) > 0:
+        combo += [mol2.atoms.pop(0)]
     final_combo = pdb.PDBMolecule(name, atoms=combo, center=False)
     final_combo.render_molecule()
     return final_combo
@@ -320,7 +445,7 @@ def move_objects(obj, step, mother=False):
                                                         keyframe_frames_data[frame]+1)]:
             # move the object to the place equevelent to the step
             print("(move) if:", obj)
-            if molecule_data[1]:
+            if molecule_data[0] and molecule_data[1]:
                 
                 start_pos = MOLECULES[obj]["start"].copy()
                 for index in range(frame):
@@ -339,7 +464,7 @@ def move_objects(obj, step, mother=False):
             elif mother and step != keyframe_frames_data[frame]:
                 MOLECULES[obj].move_to(keyframe_endpos_data[frame-1])
 
-            else:
+            elif molecule_data[0]:
                 distance = calculate_distance([keyframe_frames_data[frame-1], keyframe_frames_data[frame]],
                                               keyframe_endpos_data[frame][:3],
                                               step,
@@ -347,19 +472,41 @@ def move_objects(obj, step, mother=False):
 
                 MOLECULES[obj].move_to(list(distance))
 
+            elif not molecule_data[0]:
+                if obj == "camera":
+                    location = calculate_distance([keyframe_frames_data[frame-1], keyframe_frames_data[frame]],
+                                                  keyframe_endpos_data[frame][0][:3],
+                                                  step,
+                                                  keyframe_endpos_data[frame-1][0][:3])
+
+                    look_at = calculate_distance([keyframe_frames_data[frame-1], keyframe_frames_data[frame]],
+                                                  keyframe_endpos_data[frame][1][:3],
+                                                  step,
+                                                  keyframe_endpos_data[frame-1][1][:3])
+
+                    MOLECULES[obj] = [location, look_at]
+
             # if molecules need to be joined
-            if step == keyframe_frames_data[frame] and try_dict_keys(keyframe_endpos_data[frame], 3):
-                print("join {} and {} at frame {}".format(obj, keyframe_endpos_data[frame][4], step))
-                
-                MOLECULES[obj] = molecule_maker(MOLECULES[obj], MOLECULES[keyframe_endpos_data[frame][4]]["molecule"], obj)
+            if step == keyframe_frames_data[frame] and try_dict_keys(keyframe_endpos_data[frame], 3) and not mother and not keyframe_endpos_data[frame][4]:
+                for mol in range(5, 5+len(keyframe_endpos_data[frame][5:])):
+                    print("join {} and {} at frame {}".format(obj, keyframe_endpos_data[frame][mol], step))
+                    # Set the molecules that is
+                    move_objects(keyframe_endpos_data[frame][mol], step)
+                    if ANIMATION_OBJECTS[keyframe_endpos_data[frame][mol]]["molecule"][1]:
+                        MOLECULES[obj] = molecule_maker(MOLECULES[obj], MOLECULES[keyframe_endpos_data[frame][mol]]["molecule"], obj)
+                    else:
+                        MOLECULES[obj] = molecule_maker(MOLECULES[obj], MOLECULES[keyframe_endpos_data[frame][mol]], obj)
+                    keyframe_endpos_data[frame][4] = True
             break
 
-        elif frame == 0 and step == keyframe_frames_data[frame] and molecule_data[0]:
+        elif frame == 0 and step <= keyframe_frames_data[frame]:
             # if true move objects to start position and go to the next molecule
             print("(move) elif1:", obj)
             #print(MOLECULES[obj])
-            if not molecule_data[1]:
+            if molecule_data[0] and not molecule_data[1]:
                 MOLECULES[obj].move_to(keyframe_endpos_data[frame])
+            elif obj == "camera":
+                MOLECULES[obj] = [keyframe_endpos_data[frame][0], keyframe_endpos_data[frame][1]]
             break
 
         elif molecule_data[0] and molecule_data[1]:
@@ -375,7 +522,21 @@ def move_objects(obj, step, mother=False):
             if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
                 print("(move) elif3:", obj)
             MOLECULES[obj].move_to(keyframe_endpos_data[frame][:3])
+            
+            # if molecules need to be joined
+            if step >= keyframe_frames_data[frame] and try_dict_keys(keyframe_endpos_data[frame], 3) and not mother and not keyframe_endpos_data[frame][4]:
+                for mol in range(5, 5+len(keyframe_endpos_data[frame][5:])):
+                    print("join {} and {} at frame {}".format(obj, keyframe_endpos_data[frame][mol], keyframe_frames_data[frame]))
+                    # Set the molecules that is
+                    move_objects(keyframe_endpos_data[frame][mol], keyframe_frames_data[frame])
+                    MOLECULES[obj] = molecule_maker(MOLECULES[obj], MOLECULES[keyframe_endpos_data[frame][mol]]["molecule"], obj)
+                    keyframe_endpos_data[frame][4] = True
 
+        else:
+            if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
+                print("(move) else: {}".format(obj))
+            if obj == "camera":
+                MOLECULES[obj] = [keyframe_endpos_data[frame][0], keyframe_endpos_data[frame][1]]
 
 def rotate_objects(obj, step, mother=False):
     rotate_frames_data = ANIMATION_OBJECTS[obj]["keyframe_rotation_frames"]
@@ -383,11 +544,6 @@ def rotate_objects(obj, step, mother=False):
 
     for frame in range(len(rotate_frames_data)):
         # Calculate the start rotation of the molecule
-        start_pos = rotate_endpos_data[0][1]
-        for index in range(frame):
-            start_pos[0] += rotate_endpos_data[index][1][0]
-            start_pos[1] += rotate_endpos_data[index][1][1]
-            start_pos[2] += rotate_endpos_data[index][1][2]
 
         if frame != 0 and step in [val for val in range(rotate_frames_data[frame-1]+1,
                                                         rotate_frames_data[frame]+1)]:
@@ -396,21 +552,57 @@ def rotate_objects(obj, step, mother=False):
             # rotate the object to the place equevelent to the step
             if mother:
                 radians = calculate_radians([rotate_frames_data[frame-1], rotate_frames_data[frame]],
-                                        rotate_endpos_data[frame][1],
-                                        start_pos)
+                                             rotate_endpos_data[frame][1],
+                                             )
+
+                MOLECULES[obj].rotate([1, 1, 1], [radians[0]*-1, radians[1]*-1, radians[2]*-1])
                 
-                MOLECULES[obj].rotate(rotate_endpos_data[frame][0],
-                                          [radians[0] * -1, radians[1] * -1, radians[2] * -1],
-                                          )
             else:
                 radians = calculate_radians([rotate_frames_data[frame-1], rotate_frames_data[frame]],
                                             rotate_endpos_data[frame][1],
-                                            start_pos)
+                                            )
+                
+                MOLECULES[obj].rotate([1, 1, 1], radians)
+            break
 
-                MOLECULES[obj].rotate(rotate_endpos_data[frame][0],
-                                              radians,
-                                              )
     return
+
+def shown_objects(obj, step, render_list):
+    shown_frames_data = ANIMATION_OBJECTS[obj]["keyframe_shown_frames"]
+    shown_bool_data = ANIMATION_OBJECTS[obj]["keyframe_shown"]
+    for frame in range(len(shown_frames_data)):
+        if frame != 0 and step < shown_frames_data[frame] and shown_bool_data[frame-1]:
+            print("(shown) if: {}".format(obj))
+            render_list = put_object_in_render_list(obj, render_list)
+            break
+        
+        elif frame == 0 and step <= shown_frames_data[frame] and shown_bool_data[frame]:
+            print("(shown) elif1: {}".format(obj))
+            render_list = put_object_in_render_list(obj, render_list)
+            break
+        
+        elif shown_frames_data[frame] == shown_frames_data[-1] and step > shown_frames_data[frame] and shown_bool_data[frame]:
+            print("(shown) elif2: {}".format(obj))
+            render_list = put_object_in_render_list(obj, render_list)
+            break
+        else:
+            if shown_frames_data[frame] == shown_frames_data[-1]:
+                print("(shown) else: {} (object not shown)".format(obj))
+            
+
+            
+    return render_list
+
+def put_object_in_render_list(obj, render_list):
+    molecule_data = ANIMATION_OBJECTS[obj]["molecule"]
+    if molecule_data[0] and molecule_data[1]:
+        render_list = render_list + MOLECULES[obj]["molecule"].povray_molecule
+    elif molecule_data[0]:
+        render_list = render_list + MOLECULES[obj].povray_molecule
+    elif not obj == "camera":
+        render_list = render_list + MOLECULES[obj]
+    return render_list
+    
 
 def try_dict_keys(dictionary, key):
     try:
@@ -451,8 +643,6 @@ def make_frame(step):
             MOLECULES[obj] = {"molecule": split_molecule,
                               "start": split_molecule.center.copy()
                               }
-            print(obj+":", MOLECULES[obj]["start"])
-
             # Set the mother molecule on the start rotation back before the split.
             if try_dict_keys(ANIMATION_OBJECTS[ANIMATION_OBJECTS[molecule_data[2]]["name"]], "keyframe_rotation_frames") and\
                try_dict_keys(ANIMATION_OBJECTS[ANIMATION_OBJECTS[molecule_data[2]]["name"]], "keyframe_rotation"):
@@ -472,13 +662,14 @@ def make_frame(step):
                 rotate_objects(obj, step)
 
             # Put the different objects in the render list
-            if molecule_data[0] and molecule_data[1]:
-                render_list = render_list + MOLECULES[obj]["molecule"].povray_molecule
-            elif molecule_data[0]:
-                render_list = render_list + MOLECULES[obj].povray_molecule
+            if try_dict_keys(ANIMATION_OBJECTS[obj], "keyframe_shown_frames") and\
+               try_dict_keys(ANIMATION_OBJECTS[obj], "keyframe_shown"):
+                render_list = shown_objects(obj, step, render_list)
             else:
-                render_list = render_list + MOLECULES[obj]
-                
+                render_list = put_object_in_render_list(obj, render_list)
+            if obj == "camera":
+                cam = Camera("location", MOLECULES[obj][0], "look_at", MOLECULES[obj][1])
+
     return Scene(cam, objects=render_list)
 
 
@@ -487,10 +678,7 @@ def main():
     global MOLECULES
     get_animation_data()
     MOLECULES = make_molecules(molecules={})
-    pypovray.render_scene_to_png(make_frame, range(10,31))
-
-    print(MOLECULES["ethanol"])
-
+    pypovray.render_scene_to_png(make_frame, range(280))
     return 0
 
 
