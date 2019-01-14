@@ -87,11 +87,11 @@ def get_animation_data():
     global ANIMATION_OBJECTS
 
     animatie_data_0 = ethanol_2_acetic_acid()
-    animatie_data_1 = ethanol_2_acetic_acid(1, 260, [[60, 20, 0], [0, 0, 0], [-60, 10, 0]], 80, -10, 15)
-    animatie_data_2 = ethanol_2_acetic_acid(2, 260, [[60, 10, 0], [0, 20, 0], [-60, 10, 0]], 160, 400, 15)
-    animatie_data_3 = ethanol_2_acetic_acid(3, 260, [[60, 00, 0], [0, 0, 0], [-60, 0, 0]], 0, 0, 15)
-    animatie_data_4 = ethanol_2_acetic_acid(4, 260, [[60, -10, 0], [0, -10, 0], [-60, -10, 0]], 120, 30, 15)
-    animatie_data_5 = ethanol_2_acetic_acid(5, 260, [[60, -20, 0], [0, -20, 0], [-60, -20, 0]], 40, 400, 15)
+    animatie_data_1 = ethanol_2_acetic_acid(1, 270, [[60, 20, 0], [0, 0, 0], [-60, 10, 0]], 80, -10, 15)
+    animatie_data_2 = ethanol_2_acetic_acid(2, 270, [[60, 10, 0], [0, 20, 0], [-60, 10, 0]], 160, 400, 15)
+    animatie_data_3 = ethanol_2_acetic_acid(3, 270, [[60, 00, 0], [0, 0, 0], [-60, 0, 0]], 0, 0, 15)
+    animatie_data_4 = ethanol_2_acetic_acid(4, 270, [[60, -10, 0], [0, -10, 0], [-60, -10, 0]], 120, 30, 15)
+    animatie_data_5 = ethanol_2_acetic_acid(5, 270, [[60, -20, 0], [0, -20, 0], [-60, -20, 0]], 40, 400, 15)
     animation_data = [animatie_data_0,
                       animatie_data_1,
                       animatie_data_2,
@@ -107,9 +107,7 @@ def make_molecules(molecules):
     """
     make_molecules([frame, molecules])
     """
-    sorted_animation_objects = sort_molecules()
-
-    for obj in sorted_animation_objects:
+    for obj in ANIMATION_OBJECTS:
         molecule_data = ANIMATION_OBJECTS[obj]["molecule"]
 
         if molecule_data[0] and not molecule_data[1]:
@@ -427,8 +425,10 @@ def make_frame(step):
 
     print("frame:{}----------------------------------------------------------------".format(step))
 
+    sorted_animation_objects = sort_molecules()
+
     # Is there another None molecule that needs to be created.
-    for obj in MOLECULES:
+    for obj in sorted_animation_objects:
         molecule_data = ANIMATION_OBJECTS[obj]["molecule"]
         keyframe_frames_data = ANIMATION_OBJECTS[obj]["keyframe_endpos_frames"]
         if MOLECULES[obj] is None and step >= keyframe_frames_data[0]:
@@ -441,7 +441,7 @@ def make_frame(step):
             if try_dict_keys(ANIMATION_OBJECTS[mother_name], "keyframe_rotation_frames") and\
                try_dict_keys(ANIMATION_OBJECTS[mother_name], "keyframe_rotation"):
                 rotate_objects(mother_name, step)
-                
+            print(obj)
             # Call make molecules to split the molecule
             split_molecule = MOLECULES[molecule_data[2]].divide(molecule_data[3],
                                                                 obj,
@@ -489,7 +489,7 @@ def main():
     global MOLECULES
     get_animation_data()
     MOLECULES = make_molecules(molecules={})
-    pypovray.render_scene_to_png(make_frame, range(290, 690))
+    pypovray.render_scene_to_png(make_frame, range(0, 700))
     return 0
 
 
