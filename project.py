@@ -87,10 +87,10 @@ def get_animation_data():
     global ANIMATION_OBJECTS
 
     animatie_data_0 = ethanol_2_acetic_acid()
-    animatie_data_1 = ethanol_2_acetic_acid(1, 260, [[60, 20, 0], [0, 0, 0], [-60, 20, 0]], 80, 0, 15)
+    animatie_data_1 = ethanol_2_acetic_acid(1, 260, [[60, 20, 0], [0, 0, 0], [-60, 10, 0]], 80, -10, 15)
     animatie_data_2 = ethanol_2_acetic_acid(2, 260, [[60, 10, 0], [0, 20, 0], [-60, 10, 0]], 160, 400, 15)
     animatie_data_3 = ethanol_2_acetic_acid(3, 260, [[60, 00, 0], [0, 0, 0], [-60, 0, 0]], 0, 0, 15)
-    animatie_data_4 = ethanol_2_acetic_acid(4, 260, [[60, -10, 0], [0, -10, 0], [-60, -10, 0]], 120, 40, 15)
+    animatie_data_4 = ethanol_2_acetic_acid(4, 260, [[60, -10, 0], [0, -10, 0], [-60, -10, 0]], 120, 30, 15)
     animatie_data_5 = ethanol_2_acetic_acid(5, 260, [[60, -20, 0], [0, -20, 0], [-60, -20, 0]], 40, 400, 15)
     animation_data = [animatie_data_0,
                       animatie_data_1,
@@ -102,7 +102,6 @@ def get_animation_data():
     for animation_dict in animation_data:
         for obj in animation_dict:
             ANIMATION_OBJECTS[obj] = animation_dict[obj]
-    print(ANIMATION_OBJECTS)
 
 def make_molecules(molecules):
     """
@@ -490,7 +489,7 @@ def main():
     global MOLECULES
     get_animation_data()
     MOLECULES = make_molecules(molecules={})
-    pypovray.render_scene_to_png(make_frame, range(290, 600))
+    pypovray.render_scene_to_png(make_frame, range(290, 690))
     return 0
 
 
