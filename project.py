@@ -87,7 +87,7 @@ def get_animation_data():
     global ANIMATION_OBJECTS
 
     animatie_data_0 = ethanol_2_acetic_acid()
-    animatie_data_1 = ethanol_2_acetic_acid(1, 270, [[60, 20, 0], [0, 0, 0], [-60, 10, 0]], 80, -10, 15)
+    animatie_data_1 = ethanol_2_acetic_acid(1, 270, [[60, 20, 0], [0, 0, 0], [-60, 10, 0]], 80, 0, 15)
     animatie_data_2 = ethanol_2_acetic_acid(2, 270, [[60, 10, 0], [0, 20, 0], [-60, 10, 0]], 160, 400, 15)
     animatie_data_3 = ethanol_2_acetic_acid(3, 270, [[60, 00, 0], [0, 0, 0], [-60, 0, 0]], 0, 0, 15)
     animatie_data_4 = ethanol_2_acetic_acid(4, 270, [[60, -10, 0], [0, -10, 0], [-60, -10, 0]], 120, 30, 15)
@@ -112,11 +112,14 @@ def make_molecules(molecules):
 
         if molecule_data[0] and not molecule_data[1]:
             # Making normal molecules from pdb file
-            molecule = pdb.PDBMolecule(molecule_data[2], center=True)
+            mol = pdb.PDBMolecule(molecule_data[2], center=True)
+            molecule ={"molecule": mol,
+                       "reset": [0, mol.atoms.copy()],
+                       }
 
         elif not molecule_data[0]:
             # Making basic vapory objects
-            molecule = molecule_data[1:]
+            molecule = {"molecule": molecule_data[1:]}
 
         elif molecule_data[0] and molecule_data[1]:
             # Make the molecule a None object until it is time to split the moleucle
@@ -152,7 +155,7 @@ def sort_molecules():
 
     for mother in mother_list:
         high_2_low = get_highest(mother, special_object_list, [])
-        print("SORTED:", high_2_low)
+        print("SORTED {}: {}".format(mother, high_2_low))
         for obj in high_2_low:
             if not obj in sorted_animation_objects:
                 sorted_animation_objects.append(obj)
@@ -260,7 +263,7 @@ def move_objects(obj, step, mother=False):
                 MOLECULES[obj]["molecule"].move_to(list(distance))
                 
             elif mother and step != keyframe_frames_data[frame]:
-                MOLECULES[obj].move_to(keyframe_endpos_data[frame-1])
+                MOLECULES[obj]["molecule"].move_to(keyframe_endpos_data[frame-1])
 
             elif molecule_data[0]:
                 distance = calculate_distance([keyframe_frames_data[frame-1], keyframe_frames_data[frame]],
@@ -268,7 +271,7 @@ def move_objects(obj, step, mother=False):
                                               step,
                                               keyframe_endpos_data[frame-1][:3])
 
-                MOLECULES[obj].move_to(list(distance))
+                MOLECULES[obj]["molecule"].move_to(list(distance))
 
             elif not molecule_data[0]:
                 if obj == "camera":
@@ -282,7 +285,7 @@ def move_objects(obj, step, mother=False):
                                                   step,
                                                   keyframe_endpos_data[frame-1][1][:3])
 
-                    MOLECULES[obj] = [location, look_at]
+                    MOLECULES[obj]["molecule"] = [location, look_at]
 
             # if molecules need to be joined
             if step == keyframe_frames_data[frame] and try_dict_keys(keyframe_endpos_data[frame], 3) and not mother and not keyframe_endpos_data[frame][4]:
@@ -290,10 +293,8 @@ def move_objects(obj, step, mother=False):
                     print("join {} and {} at frame {}".format(obj, keyframe_endpos_data[frame][mol], step))
                     # Set the molecules that is
                     move_objects(keyframe_endpos_data[frame][mol], step)
-                    if ANIMATION_OBJECTS[keyframe_endpos_data[frame][mol]]["molecule"][1]:
-                        MOLECULES[obj] = molecule_maker(MOLECULES[obj], MOLECULES[keyframe_endpos_data[frame][mol]]["molecule"], obj)
-                    else:
-                        MOLECULES[obj] = molecule_maker(MOLECULES[obj], MOLECULES[keyframe_endpos_data[frame][mol]], obj)
+                    MOLECULES[obj]["molecule"] = molecule_maker(MOLECULES[obj]["molecule"], MOLECULES[keyframe_endpos_data[frame][mol]]["molecule"], obj)
+    
                     keyframe_endpos_data[frame][4] = True
             break
 
@@ -301,9 +302,9 @@ def move_objects(obj, step, mother=False):
             # if true move objects to start position and go to the next molecule
             print("(move) elif1:", obj)
             if molecule_data[0] and not molecule_data[1]:
-                MOLECULES[obj].move_to(keyframe_endpos_data[frame])
+                MOLECULES[obj]["molecule"].move_to(keyframe_endpos_data[frame])
             elif obj == "camera":
-                MOLECULES[obj] = [keyframe_endpos_data[frame][0], keyframe_endpos_data[frame][1]]
+                MOLECULES[obj]["molecule"] = [keyframe_endpos_data[frame][0], keyframe_endpos_data[frame][1]]
             break
 
         elif molecule_data[0] and molecule_data[1]:
@@ -318,7 +319,7 @@ def move_objects(obj, step, mother=False):
         elif molecule_data[0]:
             if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
                 print("(move) elif3:", obj)
-            MOLECULES[obj].move_to(keyframe_endpos_data[frame][:3])
+            MOLECULES[obj]["molecule"].move_to(keyframe_endpos_data[frame][:3])
             
             # if molecules need to be joined
             if step >= keyframe_frames_data[frame] and try_dict_keys(keyframe_endpos_data[frame], 3) and not mother and not keyframe_endpos_data[frame][4]:
@@ -326,17 +327,14 @@ def move_objects(obj, step, mother=False):
                     print("join {} and {} at frame {}".format(obj, keyframe_endpos_data[frame][mol], keyframe_frames_data[frame]))
                     # Set the molecules that is
                     move_objects(keyframe_endpos_data[frame][mol], keyframe_frames_data[frame])
-                    if ANIMATION_OBJECTS[keyframe_endpos_data[frame][mol]]["molecule"][1]:
-                        MOLECULES[obj] = molecule_maker(MOLECULES[obj], MOLECULES[keyframe_endpos_data[frame][mol]]["molecule"], obj)
-                    else:
-                        MOLECULES[obj] = molecule_maker(MOLECULES[obj], MOLECULES[keyframe_endpos_data[frame][mol]], obj)
-                    keyframe_endpos_data[frame][4] = True
+                    MOLECULES[obj]["molecule"] = molecule_maker(MOLECULES[obj]["molecule"], MOLECULES[keyframe_endpos_data[frame][mol]]["molecule"], obj)
+                keyframe_endpos_data[frame][4] = True
 
         else:
             if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
                 print("(move) else: {}".format(obj))
             if obj == "camera":
-                MOLECULES[obj] = [keyframe_endpos_data[frame][0], keyframe_endpos_data[frame][1]]
+                MOLECULES[obj]["molecule"] = [keyframe_endpos_data[frame][0], keyframe_endpos_data[frame][1]]
 
 
 def rotate_objects(obj, step, mother=False):
@@ -356,14 +354,14 @@ def rotate_objects(obj, step, mother=False):
                                              rotate_endpos_data[frame][1],
                                              )
 
-                MOLECULES[obj].rotate([1, 1, 1], [radians[0]*-1, radians[1]*-1, radians[2]*-1])
+                MOLECULES[obj]["molecule"].rotate([1, 1, 1], [radians[0]*-1, radians[1]*-1, radians[2]*-1])
                 
             else:
                 radians = calculate_radians([rotate_frames_data[frame-1], rotate_frames_data[frame]],
                                             rotate_endpos_data[frame][1],
                                             )
                 
-                MOLECULES[obj].rotate([1, 1, 1], radians)
+                MOLECULES[obj]["molecule"].rotate([1, 1, 1], radians)
             break
 
     return
@@ -398,12 +396,10 @@ def shown_objects(obj, step, render_list):
 
 def put_object_in_render_list(obj, render_list):
     molecule_data = ANIMATION_OBJECTS[obj]["molecule"]
-    if molecule_data[0] and molecule_data[1]:
+    if molecule_data[0]:
         render_list = render_list + MOLECULES[obj]["molecule"].povray_molecule
-    elif molecule_data[0]:
-        render_list = render_list + MOLECULES[obj].povray_molecule
     elif not obj == "camera":
-        render_list = render_list + MOLECULES[obj]
+        render_list = render_list + MOLECULES[obj]["molecule"]
     return render_list
     
 
@@ -443,13 +439,16 @@ def make_frame(step):
                 rotate_objects(mother_name, step)
             print(obj)
             # Call make molecules to split the molecule
-            split_molecule = MOLECULES[molecule_data[2]].divide(molecule_data[3],
-                                                                obj,
-                                                                offset=[0, 0, 0]
-                                                                )
+            split_molecule = MOLECULES[molecule_data[2]]["molecule"].divide(molecule_data[3],
+                                                                            obj,
+                                                                            offset=[0, 0, 0]
+                                                                            )
+
             MOLECULES[obj] = {"molecule": split_molecule,
-                              "start": split_molecule.center.copy()
+                              "start": split_molecule.center.copy(),
+                              "reset": split_molecule.atoms,
                               }
+
             # Set the mother molecule on the start rotation back before the split.
             if try_dict_keys(ANIMATION_OBJECTS[mother_name], "keyframe_rotation_frames") and\
                try_dict_keys(ANIMATION_OBJECTS[mother_name], "keyframe_rotation"):
@@ -479,7 +478,7 @@ def make_frame(step):
                 render_list = put_object_in_render_list(obj, render_list)
                 
             if obj == "camera":
-                cam = Camera("location", MOLECULES[obj][0], "look_at", MOLECULES[obj][1])
+                cam = Camera("location", MOLECULES[obj]["molecule"][0], "look_at", MOLECULES[obj]["molecule"][1])
 
     return Scene(cam, objects=render_list)
 

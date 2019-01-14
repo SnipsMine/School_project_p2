@@ -276,7 +276,7 @@ def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0,
                }
 
     h_movement_nad1_2 = {"name": "h_movement_nad{}_2".format(num),
-                         "molecule": [True, True, "NAD1_2".format(num), [64]],
+                         "molecule": [True, True, "NAD{}_2".format(num), [64]],
                          "keyframe_endpos_frames": [190, 205],
                          "keyframe_endpos": [[0, 0, 0],
                                              [-0.3, 0.2, -0.9],
