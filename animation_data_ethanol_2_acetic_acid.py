@@ -24,7 +24,7 @@ from pypovray import models
 
 # Functions
 def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0, 0], [-70, 0, 0]],
-                       ethanol_start_wacht = 0, ethanol_mid_wacht = -1, aldh_speed = 0):
+                       ethanol_start_wacht = 0, ethanol_mid_wacht = -1, aldh_speed = 0, show_name = False):
     """
     Gets the data for the animation
 
@@ -68,7 +68,7 @@ def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0,
         ethanol_shown = True
         # Camera
         camera = {"name": "camera",
-                  "molecule": [False, Camera("lokation", [0, 0, 100], "look_at", [0, 0, 0])],
+                  "molecule": [False, [0, 0, 100], [0, 0, 0]],
                   "keyframe_endpos_frames": [0, 30, 90, 140, 190, 250, 280],
                   "keyframe_endpos": [[[0, 0, 100], [0, 0, 0]],
                                       [[30, 0, 50], [30, 0, -10]],
@@ -125,7 +125,7 @@ def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0,
                   "keyframe_shown": [ethanol_shown, True, True],
                   }
 
-    water1_1 = {"name": "water{}_1.format(num)",
+    water1_1 = {"name": "water{}_1".format(num),
                 "molecule": [True, False, "pdb/water.pdb"],
                 "keyframe_endpos_frames": [30, 75, 90, 140],
                 "keyframe_endpos": [[-30, -70, 0],
@@ -325,6 +325,12 @@ def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0,
                              }
 
     for obj in animation_objects:
+
+        if show_name and not obj == "camera":
+            animation_objects[obj]["show_name"] = True
+        else:
+            animation_objects[obj]["show_name"] = False
+
         if try_dict_keys(animation_objects[obj], "keyframe_endpos_frames"):
             for frame in range(len(animation_objects[obj]["keyframe_endpos_frames"])):
                 animation_objects = add_multipliers(obj, frame, animation_objects, "keyframe_endpos_frames", start_frame, ethanol_start_wacht, ethanol_mid_wacht, aldh_speed)
@@ -332,7 +338,6 @@ def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0,
         if try_dict_keys(animation_objects[obj], "keyframe_rotation_frames"):
             for frame in range(len(animation_objects[obj]["keyframe_rotation_frames"])):
                 animation_objects = add_multipliers(obj, frame, animation_objects, "keyframe_rotation_frames", start_frame, ethanol_start_wacht, ethanol_mid_wacht, aldh_speed)
-
 
         if try_dict_keys(animation_objects[obj], "keyframe_shown_frames"):
             for frame in range(len(animation_objects[obj]["keyframe_shown_frames"])):

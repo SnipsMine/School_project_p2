@@ -20,6 +20,7 @@ Upcomming functions:
 - Reading the animation data from a .micdes animation file
 - Add support for splits with multiple atoms at a time
 - Add support for moving vapory objects.
+- Showing labels
 
 Known bugs:
 - After splitting a molecule the molecule auto centers itself. This couses the molecule to moves a
@@ -33,7 +34,8 @@ __version__ = "1.0.0"
 # Imports
 import sys
 import math
-from vapory import Sphere, Camera, LightSource, Scene
+import numpy as np 
+from vapory import Sphere, Camera, LightSource, Scene, Text
 from pypovray import pypovray, models, pdb
 from animation_data_ethanol_2_acetic_acid import get_animation_data as ethanol_2_acetic_acid
 
@@ -44,7 +46,7 @@ ANIMATION_OBJECTS = {}
 
 
 # Functions
-def get_animation_data():
+def get_animation_data(show_name):
     """
     Gets the data for the animation
 
@@ -86,12 +88,12 @@ def get_animation_data():
 
     global ANIMATION_OBJECTS
 
-    animatie_data_0 = ethanol_2_acetic_acid()
-    animatie_data_1 = ethanol_2_acetic_acid(1, 270, [[60, 20, 0], [0, 0, 0], [-60, 10, 0]], 80, 0, 15)
-    animatie_data_2 = ethanol_2_acetic_acid(2, 270, [[60, 10, 0], [0, 20, 0], [-60, 10, 0]], 160, 400, 15)
-    animatie_data_3 = ethanol_2_acetic_acid(3, 270, [[60, 00, 0], [0, 0, 0], [-60, 0, 0]], 0, 0, 15)
-    animatie_data_4 = ethanol_2_acetic_acid(4, 270, [[60, -10, 0], [0, -10, 0], [-60, -10, 0]], 120, 30, 15)
-    animatie_data_5 = ethanol_2_acetic_acid(5, 270, [[60, -20, 0], [0, -20, 0], [-60, -20, 0]], 40, 400, 15)
+    animatie_data_0 = ethanol_2_acetic_acid(show_name = show_name)
+    animatie_data_1 = ethanol_2_acetic_acid(1, 270, [[60, 20, 0], [0, 0, 0], [-60, 10, 0]], 80, 0, 15, show_name)
+    animatie_data_2 = ethanol_2_acetic_acid(2, 270, [[60, 10, 0], [0, 20, 0], [-60, 10, 0]], 160, 400, 15, show_name)
+    animatie_data_3 = ethanol_2_acetic_acid(3, 270, [[60, 00, 0], [0, 0, 0], [-60, 0, 0]], 0, 0, 15, show_name)
+    animatie_data_4 = ethanol_2_acetic_acid(4, 270, [[60, -10, 0], [0, -10, 0], [-60, -10, 0]], 120, 30, 15, show_name)
+    animatie_data_5 = ethanol_2_acetic_acid(5, 270, [[60, -20, 0], [0, -20, 0], [-60, -20, 0]], 40, 400, 15, show_name)
     animation_data = [animatie_data_0,
                       animatie_data_1,
                       animatie_data_2,
@@ -115,6 +117,7 @@ def make_molecules(molecules):
             mol = pdb.PDBMolecule(molecule_data[2], center=True)
             molecule ={"molecule": mol,
                        "reset": [0, mol.atoms.copy()],
+                       "text": None
                        }
 
         elif not molecule_data[0]:
@@ -296,6 +299,9 @@ def move_objects(obj, step, mother=False):
                     MOLECULES[obj]["molecule"] = molecule_maker(MOLECULES[obj]["molecule"], MOLECULES[keyframe_endpos_data[frame][mol]]["molecule"], obj)
     
                     keyframe_endpos_data[frame][4] = True
+            # Show name
+            if ANIMATION_OBJECTS[obj]["show_name"]: 
+                show_name(obj, frame)
             break
 
         elif frame == 0 and step <= keyframe_frames_data[frame]:
@@ -305,6 +311,10 @@ def move_objects(obj, step, mother=False):
                 MOLECULES[obj]["molecule"].move_to(keyframe_endpos_data[frame])
             elif obj == "camera":
                 MOLECULES[obj]["molecule"] = [keyframe_endpos_data[frame][0], keyframe_endpos_data[frame][1]]
+
+            # Show name
+            if ANIMATION_OBJECTS[obj]["show_name"]:
+                show_name(obj, frame)
             break
 
         elif molecule_data[0] and molecule_data[1]:
@@ -315,6 +325,10 @@ def move_objects(obj, step, mother=False):
             for index in range(frame+1):
                 distance += keyframe_endpos_data[index]
             MOLECULES[obj]["molecule"].move_to(distance)
+
+            # Show name
+            if ANIMATION_OBJECTS[obj]["show_name"]:
+                show_name(obj, frame)
 
         elif molecule_data[0]:
             if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
@@ -330,9 +344,15 @@ def move_objects(obj, step, mother=False):
                     MOLECULES[obj]["molecule"] = molecule_maker(MOLECULES[obj]["molecule"], MOLECULES[keyframe_endpos_data[frame][mol]]["molecule"], obj)
                 keyframe_endpos_data[frame][4] = True
 
+            #Show name
+            if ANIMATION_OBJECTS[obj]["show_name"]:
+                show_name(obj, frame)    
+
         else:
-            if keyframe_frames_data[-1] == keyframe_frames_data[frame]:
+            if keyframe_frames_data[-1] == keyframe_frames_data[frame] and not obj == "camera":
                 print("(move) else: {}".format(obj))
+                if ANIMATION_OBJECTS[obj]["show_name"]:
+                    show_name(obj, frame)
             if obj == "camera":
                 MOLECULES[obj]["molecule"] = [keyframe_endpos_data[frame][0], keyframe_endpos_data[frame][1]]
 
@@ -385,6 +405,9 @@ def shown_objects(obj, step, render_list):
             move_objects(obj, step)
 
             # Put object in render_list
+            if ANIMATION_OBJECTS[obj]["show_name"]:
+                render_list = put_object_in_render_list(obj, render_list, text = True)
+                
             render_list = put_object_in_render_list(obj, render_list)
             break
         
@@ -393,13 +416,66 @@ def shown_objects(obj, step, render_list):
 
     return render_list
 
+def show_name(obj, frame):
+    global MOLECULES
+    print("(Show Name): {}".format(obj))
+    
+    label = ANIMATION_OBJECTS[obj]["name"].strip("1234567890_")
+    letter_offset = np.array([-0.15 * len(label),  0.13 * len(label), 0])
 
-def put_object_in_render_list(obj, render_list):
+    atom_radius = 1
+
+    #camera data
+    cam_data = MOLECULES["camera"]["molecule"]
+    camera = Camera("location", cam_data[0], "look_at", cam_data[1])
+    camera_coords = np.array(camera.args[1])
+
+    # Defining the two vectors; Atom center (A) and camera viewpoint (B)
+    if ANIMATION_OBJECTS[obj]["molecule"][0]:
+        A = np.array(MOLECULES[obj]["molecule"].center)
+    else:
+        A = np.array(ANIMATION_OBJECTS[obj]["keyframe_endpos"][frame])
+    B = np.array(camera_coords)
+    BA = B - A  # Vector B->A
+    d = math.sqrt(sum(np.power(BA, 2)))  # Euclidean distance between the vectors
+    BA = BA / d  # Normalize by its length; BA / ||BA||
+    # Here we find a point on the vector B->A with a distance of 'scale' from the
+    # atom center towards the camera (outside of the atom).
+    scale = atom_radius * 1.2
+    N = A + scale * BA # Scale and add to A
+
+    # Correct for the letter size since text is never centered and place
+    # the text in front of the atom to make it visible (emboss)
+    N -= letter_offset
+    emboss = -0.15
+    print(N)
+
+    # Now that we have the distance, we calculate the angles facing the camera
+    x1, y1, z1 = A
+    x2, y2, z2 = B
+    y_angle = math.degrees(math.atan2(x1 - x2, z1 - z2))
+    x_angle = math.degrees(math.atan2(y1 - y2, z1 - z2))
+    
+    # 'rotate' rotates the text to the camera and 'translate' positions the text
+    # on the vector originating from the camera viewpoint to the atom center.
+    # The scaling parameter scales (reduces) the text size
+    text = Text('ttf', '"timrom.ttf"', '"{}"'.format(str(label)), 0.1, 0,
+                'scale', [1.5, 1.5, 1.5], models.text_model,
+                'rotate', [0, 180, 0], "translate", N)
+
+    MOLECULES[obj]["text"] = text
+
+
+def put_object_in_render_list(obj, render_list, text = False):
     molecule_data = ANIMATION_OBJECTS[obj]["molecule"]
     if molecule_data[0]:
         render_list = render_list + MOLECULES[obj]["molecule"].povray_molecule
     elif not obj == "camera":
         render_list = render_list + MOLECULES[obj]["molecule"]
+
+    if text:
+        render_list = render_list + [MOLECULES[obj]["text"]]
+    
     return render_list
     
 
@@ -447,6 +523,7 @@ def make_frame(step):
             MOLECULES[obj] = {"molecule": split_molecule,
                               "start": split_molecule.center.copy(),
                               "reset": split_molecule.atoms,
+                              "text": None
                               }
 
             # Set the mother molecule on the start rotation back before the split.
@@ -465,7 +542,7 @@ def make_frame(step):
 
                 # Move, rotate the objects and put them in the render_list
                 render_list = shown_objects(obj, step, render_list)
-            else:
+            else:                   
                 # Move object to the correct posision based on the step
                 move_objects(obj, step)
 
@@ -486,9 +563,9 @@ def make_frame(step):
 # Main
 def main():
     global MOLECULES
-    get_animation_data()
+    get_animation_data(False)
     MOLECULES = make_molecules(molecules={})
-    pypovray.render_scene_to_png(make_frame, range(0, 700))
+    pypovray.render_scene_to_png(make_frame, range(75, 100))
     return 0
 
 
