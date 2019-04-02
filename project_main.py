@@ -27,7 +27,7 @@ Known bugs:
   bit.
 """
 
-__author__ = "Micha Beens, Des Beekhuis"
+__author__ = "Micha Beens"
 
 __version__ = "1.0.0"
 

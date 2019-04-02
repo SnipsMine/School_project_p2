@@ -12,7 +12,7 @@ will read the animation data and will render the animation.
 Also you will need to install the program povray and the python3 packages vapory and pypovray
 """
 
-__author__ = "Micha Beens, Des Beekhuis"
+__author__ = "Micha Beens"
 
 __version__ = "1.0.0"
 
