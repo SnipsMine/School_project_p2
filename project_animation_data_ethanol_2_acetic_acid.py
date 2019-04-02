@@ -20,11 +20,12 @@ __version__ = "1.0.0"
 
 import sys
 import math
-from vapory import Sphere, Camera, LightSource, Texture, Pigment, Text, Finish
+from vapory import Sphere, Texture, Pigment, Text, Finish
 from pypovray import models
 
+
 # Functions
-def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0, 0], [-70, 0, 0]],
+def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=((70, 0, 0), (0, 0, 0), (-70, 0, 0)),
                        ethanol_start_wacht=0, ethanol_mid_wacht=-1, aldh_speed=0, show_name=False):
     """
     Gets the data for the animation
@@ -116,18 +117,18 @@ def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0,
                                       [-30, 0, 0, "join", False, "water{}_3".format(num)],
                                       sme_pos_ethanol[2],
                                       ],
-                  "keyframe_rotation_frames":[29, 30, 75, 90, 140, 141, 190, 205, 250, 500],
-                  "keyframe_rotation":[[[0, 0, 0], [0, 0, 0]],
-                                       [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
-                                       [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
-                                       [[0, 0, 0], [0, 0, 0]],
-                                       [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
-                                       [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
-                                       [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
-                                       [[0, 0, 0], [0, 0, 0]],
-                                       [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
-                                       [[1, 1, 1], [math.pi*8, math.pi*8, math.pi*8]],
-                                       ],
+                  "keyframe_rotation_frames": [29, 30, 75, 90, 140, 141, 190, 205, 250, 500],
+                  "keyframe_rotation": [[[0, 0, 0], [0, 0, 0]],
+                                        [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                        [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                        [[0, 0, 0], [0, 0, 0]],
+                                        [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                        [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                        [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                        [[0, 0, 0], [0, 0, 0]],
+                                        [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                        [[1, 1, 1], [math.pi*8, math.pi*8, math.pi*8]],
+                                        ],
                   "keyframe_shown_frames": [0-start_frame, 0, 250],
                   "keyframe_shown": [ethanol_shown, True, True],
                   }
@@ -140,12 +141,12 @@ def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0,
                                     [30, -7.5, 0, "join", False, "waterstof{}_1".format(num)],
                                     [70, -70, 0],
                                     ],
-                "keyframe_rotation_frames":[30, 75, 90, 140],
-                "keyframe_rotation":[[[0, 0, 0], [0, 0, 0]],
-                                     [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
-                                     [[0, 0, 0], [0, 0, 0]],
-                                     [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]]
-                                     ],
+                "keyframe_rotation_frames": [30, 75, 90, 140],
+                "keyframe_rotation": [[[0, 0, 0], [0, 0, 0]],
+                                      [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                      [[0, 0, 0], [0, 0, 0]],
+                                      [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]]
+                                      ],
                 "keyframe_shown_frames": [0, 140],
                 "keyframe_shown": [True, False],
                 }
@@ -235,12 +236,12 @@ def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0,
                                     [-30, -7.5, 0, "join", False, "waterstof{}_2".format(num)],
                                     [30, -70, 0],
                                     ],
-                "keyframe_rotation_frames":[145, 190, 205, 260],
-                "keyframe_rotation":[[[0, 0, 0], [0, 0, 0]],
-                                     [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
-                                     [[0, 0, 0], [0, 0, 0]],
-                                     [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]]
-                                     ],
+                "keyframe_rotation_frames": [145, 190, 205, 260],
+                "keyframe_rotation": [[[0, 0, 0], [0, 0, 0]],
+                                      [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]],
+                                      [[0, 0, 0], [0, 0, 0]],
+                                      [[1, 1, 1], [math.pi*2, math.pi*2, math.pi*2]]
+                                      ],
                 "keyframe_shown_frames": [0, 145, 250],
                 "keyframe_shown": [False, True, False],
                 }
@@ -253,11 +254,11 @@ def get_animation_data(num=0, start_frame=0, sme_pos_ethanol=[[70, 0, 0], [0, 0,
                                     [-31, -2.2, 0.2],
                                     [30, -70, 0],
                                     ],
-                "keyframe_rotation_frames":[145, 190, 205],
-                "keyframe_rotation":[[[0, 0, 0], [0, 0, 0]],
-                                     [[1, 1, 1], [math.pi*2, math.pi*2, math.pi]],
-                                     [[1, 0, 0], [1, 0, 0]],
-                                     ],
+                "keyframe_rotation_frames": [145, 190, 205],
+                "keyframe_rotation": [[[0, 0, 0], [0, 0, 0]],
+                                      [[1, 1, 1], [math.pi*2, math.pi*2, math.pi]],
+                                      [[1, 0, 0], [1, 0, 0]],
+                                      ],
                 "keyframe_shown_frames": [0, 145, 205],
                 "keyframe_shown": [False, True, False],
                 }
@@ -405,7 +406,7 @@ def print_animation_data(animation_data):
 
         # if obj is not camera, print the type and name of the vapory object
         elif not obj == "camera":
-            for obj in obj_data["molecule"][1:]:
+            for something in obj_data["molecule"][1:]:
                 print("(molecule) molecule: {}, type: {}".format(molecule_data[0], "sphere"))
 
         else:
@@ -449,6 +450,7 @@ def main():
     print_animation_data(animation_data)
 
     return 0
+
 
 if __name__ == "__main__":
     EXITCODE = main()
