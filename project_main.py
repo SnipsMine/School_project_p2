@@ -518,7 +518,7 @@ def main():
     global MOLECULES
     get_animation_data(False)
     MOLECULES = make_molecules(molecules={})
-    pypovray.render_scene_to_png(make_frame, range(700))
+    pypovray.render_scene_to_mp4(make_frame, range(700))
     return 0
 
 
