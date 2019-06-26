@@ -22,6 +22,7 @@ import sys
 import math
 from vapory import Sphere, Texture, Pigment, Text, Finish
 from pypovray import models
+from animation_object import AnimationObject
 
 
 # Functions
@@ -382,64 +383,6 @@ def add_multipliers(obj, frame, animation_objects, key, start_frame, ethanol_sta
         animation_objects[obj][key][frame] += start_frame
 
     return animation_objects
-
-
-def print_animation_data(animation_data):
-    """
-    Print the animation_data to see what is in there.
-    """
-
-    for obj in animation_data:
-
-        obj_data = animation_data[obj]
-        molecule_data = obj_data["molecule"]
-
-        print("---------------------------------------------------------------------")
-
-        print("object: {}".format(obj))
-
-        # if object is a molecule, print the name type, if molecule is split and the name of the file
-        if obj_data["molecule"][0]:
-            print("(molecule) molecule: {}, split: {}, document/mother: {}".format(molecule_data[0],
-                                                                                   molecule_data[1],
-                                                                                   molecule_data[2]))
-
-        # if obj is not camera, print the type and name of the vapory object
-        elif not obj == "camera":
-            for something in obj_data["molecule"][1:]:
-                print("(molecule) molecule: {}, type: {}".format(molecule_data[0], "sphere"))
-
-        else:
-            print("(molecule) molecule: {}, type: {}".format(molecule_data[0], "camera"))
-
-        print()
-
-        # For every end possision and the coresponding frames print the data
-        for frame in range(len(obj_data["keyframe_endpos_frames"])):
-            endpos_frames = obj_data["keyframe_endpos_frames"]
-            keyframe_endpos = obj_data["keyframe_endpos"]
-            print("(endpos) frame {}: {}".format(endpos_frames[frame], keyframe_endpos[frame]))
-
-        print()
-
-        # For every rotation and the coresponding frames print the data
-        if try_dict_keys(obj_data, "keyframe_rotation_frames") and \
-           try_dict_keys(obj_data, "keyframe_rotation"):
-            for frame in range(len(obj_data["keyframe_rotation_frames"])):
-                rotation_frames = obj_data["keyframe_rotation_frames"]
-                keyframe_rotation = obj_data["keyframe_rotation"]
-                print("(rotation) frame {}: {}".format(rotation_frames[frame], keyframe_rotation[frame]))
-
-            print()
-
-        # For every time the obect needs to be shown and the coresponding frames print the data
-        if try_dict_keys(obj_data, "keyframe_shown_frames") and \
-           try_dict_keys(obj_data, "keyframe_shown"):
-            for frame in range(len(obj_data["keyframe_shown_frames"])):
-                shown_frames = obj_data["keyframe_shown_frames"]
-                keyframe_shown = obj_data["keyframe_shown"]
-                print("(rotation) frame {}: {}".format(shown_frames[frame], keyframe_shown[frame]))
-
 
 # Main
 def main():

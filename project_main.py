@@ -37,6 +37,7 @@ from vapory import Camera, LightSource, Scene
 from pypovray import pypovray, pdb
 from project_animation_data_ethanol_2_acetic_acid import get_animation_data as ethanol_2_acetic_acid
 from project_sorted_molecules import sort_molecules
+from animation_object import AnimationObject
 
 
 # Globals
@@ -123,7 +124,7 @@ def make_molecules(molecules):
             # Making basic vapory objects
             molecule = {"molecule": molecule_data[1:]}
 
-        elif molecule_data[0] and molecule_data[1]:
+        else:
             # Make the molecule a None object until it is time to split the moleucle
             molecule = None
 
@@ -399,6 +400,7 @@ def shown_objects(obj, step, render_list):
             print("(shown) elif: {} (object not shown)".format(obj))
 
     return render_list
+
 
 def put_object_in_render_list(obj, render_list, text=False):
     """
